@@ -14,6 +14,7 @@ class BlackScholesPricer:
                  payoff_type,
                  cfg_parameters
                  ):  
+        "init"
         self.dt = 1/252.0
         self.quantity = quantity
         self.T = days_to_expiry  
@@ -38,8 +39,6 @@ class BlackScholesPricer:
 
         d1 = (np.log(self.S_0 / self.K) + (self.r + 0.5 * self.sigma ** 2) * T) / (self.sigma * np.sqrt(T))
         d2 = d1 - self.sigma * np.sqrt(T)
-
-    
 
         if self.call_put == Option.CALL:
             option_price = (self.S_0 * norm.cdf(d1) - self.K * np.exp(-self.r * T) * norm.cdf(d2))

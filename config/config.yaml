@@ -7,5 +7,6 @@ Modelling:
     corr_eq_fx: 0.5
     scaling_year_days: 252
   Simulation:
-    n_paths: 1000
+    n_paths: 1000 # 1000 takes about 3 minutes
+  output_decimals: 3
 

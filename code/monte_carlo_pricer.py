@@ -22,7 +22,7 @@ class MonteCarloPricer:
                  cfg_parameters
                  ):  
         
-        self.dt = 1/252
+        self.dt = 1/252.0
         self.quantity = quantity
         self.T = days_to_expiry  
         self.T_p = payment_time_days
@@ -81,8 +81,6 @@ class MonteCarloPricer:
         self.delta = self.quantity * delta
         self.vega = self.quantity * vega
 
-        
-
     def get_call_payoffs(self, mode):
 
         eq_paths = self.simulate_eq_prices(mode)
@@ -140,16 +138,14 @@ class MonteCarloPricer:
         return final_states
 
     def simulate_asset_prices(self, S_0, r, sigma, gaussian, T):
-        dt = 1/252 # No of business days in a year
-        sqrt_dt = np.sqrt(dt)  # Square root of time step
+        dt = self.dt 
+        sqrt_dt = np.sqrt(dt)  
 
-        # Initialize array to store simulated prices for each simulation
         asset_prices = np.zeros((self.n, T + 1))
-        asset_prices[:, 0] = S_0  # Set initial asset price
-        drift_rate = r
-
+        asset_prices[:, 0] = S_0  
+        
         for i in range(1, T + 1):
-            drift = (drift_rate - 0.5 * sigma ** 2) * dt
+            drift = (r - 0.5 * sigma ** 2) * dt
             diffusion = sigma * sqrt_dt * gaussian[:, i - 1]
             asset_prices[:, i] = asset_prices[:, i - 1] * np.exp(drift + diffusion)
 
@@ -159,23 +155,22 @@ class MonteCarloPricer:
     def generate_correlated_gaussians(self):
             """
             Method to generate two correlated stochastic processes with mean zero and variance 1
+
+            We simulate two independent arrays at first, transform with covariance matrix to get the desired correlation, then reshape according
+            to time T of days to simulate and number n of paths
             """
             T = max(self.T, self.T_p)
 
-            # Generate standard normal random numbers for each asset and path
             ind_gaussian_processes = np.random.normal(size=(T * self.n, 2))
 
-            # Perform Cholesky decomposition of the correlation matrix
             cholesky_decomposition = np.linalg.cholesky(self.Sigma)
 
-            # Transform standard normal random numbers to correlated random numbers
             corr_gaussian_processes = ind_gaussian_processes @ cholesky_decomposition.T
 
-            # Reshape the correlated random numbers to a suitable ndarray
             corr_gaussian_processes = corr_gaussian_processes.reshape(self.n, T, 2)
 
-            equity_gaussian_process = corr_gaussian_processes[:, :, 0]  # Random numbers for the first asset
-            fx_gaussian_process = corr_gaussian_processes[:, :, 1]  # Random numbers for the second asset
+            equity_gaussian_process = corr_gaussian_processes[:, :, 0]  
+            fx_gaussian_process = corr_gaussian_processes[:, :, 1]  
 
             return equity_gaussian_process, fx_gaussian_process
     
