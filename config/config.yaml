@@ -1,0 +1,11 @@
+Modelling:
+  Financial:
+    drift_rate_eq: 0.03
+    drift_rate_fx: 0
+    spot_rate_fx: 1.10
+    volatility_fx: 0.1
+    corr_eq_fx: 0.5
+    scaling_year_days: 252
+  Simulation:
+    n_paths: 1000
+
